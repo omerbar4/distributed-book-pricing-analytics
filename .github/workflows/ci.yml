@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint and test (Python 3.12, Java 17, PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: book_analytics
+          POSTGRES_USER: analytics
+          POSTGRES_PASSWORD: ci-only-password  # throwaway service container, not a secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U analytics -d book_analytics"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: book_analytics
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: ci-only-password
+      REQUIRE_POSTGRES: "1"  # integration tests must run, not skip
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Test (unit + Spark + PostgreSQL integration)
+        run: pytest -q -rs
+
+  docker-build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate Compose file
+        run: docker compose config --quiet
+      - name: Build pipeline image
+        run: docker build --tag book-pricing-pipeline:ci .
+      - name: Smoke-check image toolchain
+        run: >-
+          docker run --rm book-pricing-pipeline:ci
+          python -c "import pyspark, psycopg; print('pyspark', pyspark.__version__)"

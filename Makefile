@@ -33,10 +33,10 @@ psql:  ## Open psql inside the PostgreSQL container
 	$(COMPOSE) exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
 
 # --- Local development (.venv + local JVM) -----------------------------------------
-setup:  ## Create .venv and install the project with dev + api extras
+setup:  ## Create .venv and install the project with dev extras
 	python3.12 -m venv $(VENV)
 	$(PY) -m pip install --upgrade pip
-	$(PY) -m pip install -e ".[dev,api]"
+	$(PY) -m pip install -e ".[dev]"
 
 lint:  ## Static checks (no changes)
 	$(PY) -m ruff check .

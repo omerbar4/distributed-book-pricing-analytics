@@ -6,6 +6,7 @@ skipped otherwise. They use a processing date far from any demo date and clean i
 
 from __future__ import annotations
 
+import os
 from datetime import date
 
 import psycopg
@@ -35,7 +36,10 @@ def conninfo():
         with psycopg.connect(conninfo, connect_timeout=3):
             pass
     except psycopg.OperationalError as exc:
-        pytest.skip(f"PostgreSQL not reachable ({exc.__class__.__name__}); run `make up`")
+        message = f"PostgreSQL not reachable ({exc.__class__.__name__}); run `make up`"
+        if os.environ.get("REQUIRE_POSTGRES") == "1":  # CI: never skip silently
+            pytest.fail(message)
+        pytest.skip(message)
     yield conninfo
     with psycopg.connect(conninfo) as conn:
         for spec in TABLES:
