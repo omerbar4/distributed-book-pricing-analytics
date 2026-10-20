@@ -19,6 +19,7 @@ class Settings:
     http_user_agent: str
     http_timeout_seconds: float
     http_max_retries: int
+    ingest_limit: int
     demo_random_seed: int
     spark_master: str
     spark_shuffle_partitions: int
@@ -40,6 +41,7 @@ class Settings:
             ),
             http_timeout_seconds=float(_env("HTTP_TIMEOUT_SECONDS", "15")),
             http_max_retries=int(_env("HTTP_MAX_RETRIES", "3")),
+            ingest_limit=int(_env("INGEST_LIMIT", "50")),
             demo_random_seed=int(_env("DEMO_RANDOM_SEED", "42")),
             spark_master=_env("SPARK_MASTER", "local[*]"),
             spark_shuffle_partitions=int(_env("SPARK_SHUFFLE_PARTITIONS", "4")),
