@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets / local config
+.env
+
+# Generated datasets (only the placeholder is tracked)
+data/*
+!data/.gitkeep
+
+# Spark artifacts
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

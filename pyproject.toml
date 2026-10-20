@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "distributed-book-pricing-analytics"
+version = "0.1.0"
+description = "PySpark batch pipeline for used-book pricing analytics: Open Library ingestion, medallion transforms, partitioned Parquet, PostgreSQL."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Omer Bar" }]
+requires-python = ">=3.11,<3.13"
+
+# Single source of truth for dependency versions (Docker and CI install from here).
+dependencies = [
+    "pyspark==4.0.4",
+    "requests~=2.34",
+    "psycopg[binary]~=3.3",
+]
+
+[project.optional-dependencies]
+api = [
+    "fastapi~=0.156",
+    "uvicorn~=0.54",
+]
+dev = [
+    "pytest~=9.1",
+    "ruff~=0.17",
+    "httpx~=0.28",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "integration: tests that need a running PostgreSQL (skipped when unavailable)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
