@@ -180,7 +180,26 @@ outputs on a failed gate so they can be inspected, but the loader refuses to pub
 ### Verified run
 
 <!-- VERIFIED_RUN_START -->
-_Filled in from an actual end-to-end run; see below._
+Recorded on 2026-10-20 from a **fresh `git clone`** with an empty database, on an Apple
+Silicon Mac with Docker Desktop. To keep live API traffic minimal, it used one subject
+(`SUBJECTS=science_fiction INGEST_LIMIT=40 make demo DATE=2026-10-20`); the default demo
+fetches five.
+
+| Measure | Result |
+|---|---|
+| Image build (`--no-cache`, base images already pulled) | 40 s |
+| Full demo: ingest → generate → Spark → load → report | 20 s, exit 0 |
+| Open Library works landed (1 request) | 40, all with ISBNs (7,280 ISBN values; 112,523-byte body, SHA-256 verified) |
+| Distinct valid ISBN-13s in `silver/book_metadata` | 3,963 |
+| Observation lines in / valid / rejected | 90 / 76 / 10 |
+| Exact / business duplicates | 2 / 2 |
+| Rejections by rule | invalid ISBN 2, negative price 2, blank title 2, invalid inventory 2, malformed 2 |
+| Quality pass rate / gate | 0.8864 / passed |
+| Rows matching the generator manifest | all counts identical |
+| `analytics.daily_pricing_recommendations` rows | 76 (all `SIMULATED_DEMO`) |
+| Re-run of the same date (`SKIP_INGEST=1`) | 76 deleted, 76 inserted, row counts unchanged |
+
+Counts depend on Open Library's live index and will differ on your run.
 <!-- VERIFIED_RUN_END -->
 
 ## Data-quality rules
