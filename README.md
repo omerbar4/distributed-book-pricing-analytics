@@ -1,6 +1,6 @@
 # Distributed Book Pricing Analytics Pipeline
 
-[![CI](https://github.com/OWNER/distributed-book-pricing-analytics/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
+[![CI](https://github.com/omerbar4/distributed-book-pricing-analytics/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
 
 A **PySpark batch pipeline** for used-book pricing analytics. It ingests real book metadata
 from the public **Open Library REST API**, lands it as immutable raw JSON, and runs
@@ -117,7 +117,7 @@ Silver, step by step:
 Requires Docker with Compose v2. No local Python or Java needed.
 
 ```bash
-git clone https://github.com/OWNER/distributed-book-pricing-analytics.git
+git clone https://github.com/omerbar4/distributed-book-pricing-analytics.git
 cd distributed-book-pricing-analytics
 make demo
 ```
