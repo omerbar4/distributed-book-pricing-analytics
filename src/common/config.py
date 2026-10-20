@@ -46,7 +46,7 @@ class Settings:
             spark_master=os.environ.get("SPARK_MASTER", "").strip() or None,
             spark_shuffle_partitions=int(_env("SPARK_SHUFFLE_PARTITIONS", "4")),
             postgres_host=_env("POSTGRES_HOST", "localhost"),
-            postgres_port=int(_env("POSTGRES_PORT", "5432")),
+            postgres_port=int(_env("POSTGRES_PORT", "55432")),
             postgres_db=_env("POSTGRES_DB", "book_analytics"),
             postgres_user=_env("POSTGRES_USER", "analytics"),
             postgres_password=_env("POSTGRES_PASSWORD", "change-me-local-only"),

@@ -1,0 +1,53 @@
+# Local stack: PostgreSQL + a one-shot pipeline container (Spark runs in local[*] mode
+# inside it; no Spark cluster is needed or simulated).
+#
+#   make demo            # = docker compose run --rm --build pipeline
+#   make up / make down  # PostgreSQL only
+name: book-pricing
+
+x-postgres-env: &postgres-env
+  POSTGRES_DB: ${POSTGRES_DB:-book_analytics}
+  POSTGRES_USER: ${POSTGRES_USER:-analytics}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: *postgres-env
+    ports:
+      # Bound to localhost only. 55432 avoids clashing with a local PostgreSQL on 5432.
+      - "127.0.0.1:${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - ./sql/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pipeline:
+    build: .
+    image: book-pricing-pipeline:local
+    profiles: ["pipeline"]  # not started by `up`; run explicitly
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *postgres-env
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      DATA_DIR: /app/data
+      HTTP_USER_AGENT: ${HTTP_USER_AGENT:-distributed-book-pricing-analytics/0.1 (portfolio demo)}
+      INGEST_LIMIT: ${INGEST_LIMIT:-40}
+      DEMO_RANDOM_SEED: ${DEMO_RANDOM_SEED:-42}
+      SUBJECTS: ${SUBJECTS:-science_fiction fantasy history technology business}
+      PROCESSING_DATE: ${PROCESSING_DATE:-}
+      SKIP_INGEST: ${SKIP_INGEST:-0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./data:/app/data
+    command: ["bash", "scripts/run_demo.sh"]
+
+volumes:
+  pgdata:
