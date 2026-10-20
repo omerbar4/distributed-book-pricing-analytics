@@ -4,6 +4,8 @@ PY     := $(VENV)/bin/python
 # to Homebrew's openjdk@21 when present. Scoped to make only -- no global changes.
 JAVA_HOME ?= $(wildcard /opt/homebrew/opt/openjdk@21)
 export JAVA_HOME
+# spark-submit's wrapper finds Spark via $PYSPARK_PYTHON (else `python3` on PATH).
+export PYSPARK_PYTHON := $(CURDIR)/$(PY)
 
 .PHONY: setup lint format test clean
 

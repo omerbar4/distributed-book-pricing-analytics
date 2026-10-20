@@ -21,7 +21,7 @@ class Settings:
     http_max_retries: int
     ingest_limit: int
     demo_random_seed: int
-    spark_master: str
+    spark_master: str | None
     spark_shuffle_partitions: int
     postgres_host: str
     postgres_port: int
@@ -43,7 +43,7 @@ class Settings:
             http_max_retries=int(_env("HTTP_MAX_RETRIES", "3")),
             ingest_limit=int(_env("INGEST_LIMIT", "50")),
             demo_random_seed=int(_env("DEMO_RANDOM_SEED", "42")),
-            spark_master=_env("SPARK_MASTER", "local[*]"),
+            spark_master=os.environ.get("SPARK_MASTER", "").strip() or None,
             spark_shuffle_partitions=int(_env("SPARK_SHUFFLE_PARTITIONS", "4")),
             postgres_host=_env("POSTGRES_HOST", "localhost"),
             postgres_port=int(_env("POSTGRES_PORT", "5432")),

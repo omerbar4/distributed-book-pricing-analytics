@@ -31,7 +31,7 @@ def test_settings_read_from_environment(monkeypatch):
 
     assert settings.demo_random_seed == 7
     assert settings.open_library_base_url == "https://example.test"
-    assert settings.spark_master == "local[*]"
+    assert settings.spark_master is None  # left to spark-submit (default local[*])
 
 
 def test_json_formatter_emits_extra_fields():
